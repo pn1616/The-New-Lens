@@ -1,70 +1,280 @@
-# Getting Started with Create React App
+# AI-Powered News Analysis System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern, responsive React frontend for analyzing news articles using AI-powered insights. The application provides comprehensive analysis including sentiment detection, bias analysis, stance classification, and automatic topic clustering.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+### Core Functionality
+- **Multi-Input Support**: Upload files (TXT, PDF, HTML, JSON) or analyze URLs
+- **AI Analysis**:
+  - Sentiment Analysis with confidence scores
+  - Bias Detection with direction indicators
+  - Stance Classification on topics
+  - AI-powered summarization
+  - Automatic topic clustering
 
-### `npm start`
+### User Interface
+- **Modern Design**: Clean, responsive interface built with TailwindCSS
+- **Interactive Dashboard**: View all articles with filtering and search
+- **Detailed Analysis Panel**: Comprehensive breakdown of AI insights
+- **Topic Clustering**: Visual organization of articles by themes
+- **Real-time Search**: Filter articles by content, source, or topics
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Technical Features
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Performance Optimized**: Fast loading with efficient state management
+- **Accessibility**: WCAG compliant with proper focus management
+- **Mock API**: Fully functional with realistic data simulation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Technology Stack
 
-### `npm test`
+- **Frontend**: React 19.1.0
+- **Styling**: TailwindCSS 3.4.17
+- **Icons**: Lucide React
+- **Date Handling**: date-fns
+- **Build Tool**: Create React App
+- **Package Manager**: npm
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📁 Project Structure
 
-### `npm run build`
+```
+src/
+├── components/           # Reusable UI components
+│   ├── AnalysisPanel.js     # Detailed analysis display
+│   ├── ArticleCard.js       # Article preview cards
+│   ├── ClusterFilter.js     # Topic filtering sidebar
+│   ├── Header.js            # Navigation header
+│   ├── LoadingSpinner.js    # Loading states
+│   ├── SearchBar.js         # Search functionality
+│   └── UploadSection.js     # File/URL upload interface
+├── pages/                # Main application pages
+│   ├── HomePage.js          # Landing page with features
+│   ├── UploadPage.js        # Upload and analysis page
+│   └── DashboardPage.js     # Article dashboard
+├── hooks/                # Custom React hooks
+│   └── useArticles.js       # Article state management
+├── utils/                # Utility functions
+│   └── api.js              # Mock API and helpers
+├── data/                 # Mock data
+│   └── mockData.js         # Sample articles and clusters
+├── App.js               # Main application component
+├── App.css              # Global styles
+└── index.css            # TailwindCSS imports
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🎨 Design System
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Color Palette
+- **Primary**: Blue tones for main actions and branding
+- **Secondary**: Gray scale for text and backgrounds
+- **Semantic Colors**: Green (positive), Red (negative), Yellow (neutral), Orange (warnings)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Components
+- **Cards**: Consistent shadow and border styling
+- **Buttons**: Primary and secondary variants with hover states
+- **Forms**: Consistent input styling with focus states
+- **Loading States**: Spinner components for async operations
 
-### `npm run eject`
+## 📊 Mock Data Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Article Object
+```javascript
+{
+  id: number,
+  title: string,
+  source: string,
+  url: string,
+  publishedAt: string,
+  content: string,
+  imageUrl: string,
+  analysis: {
+    sentiment: { score: number, label: string, confidence: number },
+    bias: { score: number, label: string, confidence: number, direction: string },
+    stance: { topic: string, position: string, confidence: number },
+    summary: string,
+    topics: string[]
+  },
+  cluster: string
+}
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Cluster Object
+```javascript
+{
+  id: string,
+  name: string,
+  color: string,
+  count: number,
+  articles: number[]
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🚀 Getting Started
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Prerequisites
+- Node.js 16.x or higher
+- npm 7.x or higher
 
-## Learn More
+### Installation
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd frontend
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### Code Splitting
+3. **Start development server**
+   ```bash
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+4. **Open your browser**
+   Navigate to `http://localhost:3000`
 
-### Analyzing the Bundle Size
+### Available Scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- `npm start` - Start development server
+- `npm run build` - Build for production
+- `npm test` - Run test suite
+- `npm run eject` - Eject from Create React App
 
-### Making a Progressive Web App
+## 🎯 Usage Guide
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 1. Homepage
+- View feature overview and system capabilities
+- Navigate to upload or dashboard sections
+- See system statistics and benefits
 
-### Advanced Configuration
+### 2. Upload & Analysis
+- **URL Analysis**: Paste any news article URL
+- **File Upload**: Upload text files, PDFs, HTML, or JSON
+- **Real-time Results**: See analysis appear instantly
+- **Detailed Breakdown**: View sentiment, bias, stance, and summary
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 3. Dashboard
+- **Article Grid**: Browse all analyzed articles
+- **Search**: Find articles by content, source, or topics
+- **Filter by Topic**: View articles in specific clusters
+- **Quick Stats**: See sentiment distribution at a glance
+- **Detailed Analysis**: Click any article for full AI breakdown
 
-### Deployment
+### 4. Analysis Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+#### Sentiment Analysis
+- **Score Range**: -1 (very negative) to +1 (very positive)
+- **Visual Indicators**: Color-coded with trending icons
+- **Confidence Levels**: AI confidence in the analysis
 
-### `npm run build` fails to minify
+#### Bias Detection
+- **Bias Score**: 0 (neutral) to 1 (highly biased)
+- **Direction**: Indicates the bias direction
+- **Visual Progress**: Color-coded progress bars
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+#### Stance Classification
+- **Topic Identification**: What the article is about
+- **Position**: The stance taken on the topic
+- **Confidence**: How certain the AI is about the stance
+
+#### Topic Clustering
+- **Automatic Grouping**: Articles grouped by similar themes
+- **Visual Organization**: Color-coded clusters
+- **Easy Filtering**: Click to view cluster contents
+
+## 🔧 Customization
+
+### Adding New Analysis Types
+1. Update the mock data structure in `src/data/mockData.js`
+2. Modify the `AnalysisPanel.js` component to display new analysis
+3. Update the API utilities in `src/utils/api.js`
+
+### Styling Changes
+- Modify `tailwind.config.js` for theme customization
+- Update component classes for specific styling
+- Add custom CSS in `src/App.css` for complex animations
+
+### API Integration
+- Replace mock API calls in `src/utils/api.js`
+- Update error handling for real API responses
+- Modify data structures to match your API
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Deploy to Static Hosting
+The build folder can be deployed to any static hosting service:
+- Netlify
+- Vercel
+- GitHub Pages
+- AWS S3
+- Firebase Hosting
+
+### Environment Variables
+Create a `.env` file for production settings:
+```
+REACT_APP_API_URL=your-api-url
+REACT_APP_ENVIRONMENT=production
+```
+
+## 🧪 Testing
+
+### Running Tests
+```bash
+npm test
+```
+
+### Test Coverage
+```bash
+npm test -- --coverage
+```
+
+### Testing Strategy
+- Component unit tests
+- Integration tests for user flows
+- Mock API testing
+- Accessibility testing
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- **Real-time Updates**: WebSocket integration for live analysis
+- **Export Functionality**: PDF/CSV export of analysis results
+- **User Authentication**: Personal dashboards and saved articles
+- **Advanced Filtering**: Date ranges, sentiment thresholds
+- **Batch Processing**: Multiple file uploads
+- **Analytics Dashboard**: Trend analysis over time
+
+### Technical Improvements
+- **Performance**: Virtual scrolling for large datasets
+- **Offline Support**: Service worker for offline functionality
+- **Internationalization**: Multi-language support
+- **Advanced Search**: Full-text search with highlighting
+- **Data Visualization**: Charts and graphs for analysis trends
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📞 Support
+
+For support, please open an issue in the GitHub repository or contact the development team.
+
+---
+
+**Built with ❤️ using React and TailwindCSS**
