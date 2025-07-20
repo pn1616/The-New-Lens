@@ -1,6 +1,7 @@
+import json
 from bs4 import BeautifulSoup
 import requests
-import json
+
 
 url = 'https://www.bbc.com/news'
 r = requests.get(url)
