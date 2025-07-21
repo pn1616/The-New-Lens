@@ -1,4 +1,4 @@
-#using google fact check api
+#using llama3 for fact-checking
 
 import json
 import subprocess
