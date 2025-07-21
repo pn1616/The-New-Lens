@@ -31,7 +31,8 @@ class CNNScrapper(ScraperInterface):
 
                     self.articles.append({
                         "title": title,
-                        "url": link
+                        "url": link,
+                        "source": "CNN",
                     })
 
             with open(self.meta_file, 'w') as f:

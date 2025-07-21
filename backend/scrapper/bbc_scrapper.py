@@ -29,6 +29,7 @@ class BBCScrapper(ScraperInterface):
                         article = {
                             "title": item.get('title', ''),
                             "url": self.base_url + item.get('href', ''),
+                            "source": "BBC"
                         }
                         self.articles.append(article)
             with open(self.meta_file, 'w') as f:
