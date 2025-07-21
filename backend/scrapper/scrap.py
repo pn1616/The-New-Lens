@@ -28,4 +28,4 @@ for section in parsed_json['props']['pageProps']['page']['@"news",']['sections']
 with open('bbc.json','w') as f:
     json.dump(articles, f, indent=4)
 
-print("we did it but check json for confirmation cant trust u lol")
+print("check json")
