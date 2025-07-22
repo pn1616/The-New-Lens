@@ -53,12 +53,15 @@ class CNNScrapper(ScraperInterface):
 
             for article in self.articles:
                 print(f"scraping: {article['title'][:50]}")
-                content = self.get_article_content(article['url'])
-                if content:
-                    article['content'] = content
+                result = self.get_article_content(article['url'])
+
+                if result:
+                    article['content'] = result["content"]
+                    article['date'] = result["date"]
                 else:
                     print("empty")
                     continue
+
                 time.sleep(1)
 
             self.articles = [a for a in self.articles if a.get("content")]
@@ -70,6 +73,7 @@ class CNNScrapper(ScraperInterface):
 
         except Exception as e:
             print(f"error: {e}")
+
 
     def get_article_content(self, url):
         try:
@@ -84,9 +88,22 @@ class CNNScrapper(ScraperInterface):
                 return ""
 
             full_text = "\n".join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
-            return full_text.strip()
+
+            date_text = "Unknown"
+
+            ts1 = soup.find("div", class_="timestamp")
+            if ts1:
+                date_text = ts1.get_text(strip=True)
+
+            ts2 = soup.find("div", class_="timestamp_published")
+            if ts2:
+                date_text = ts2.get_text(strip=True)
+
+            return {
+                "content": full_text.strip(),
+                "date": date_text
+            }
 
         except Exception as e:
-            print(f"error: {e}")
+            print(f"error ({url}): {e}")
             return ""
-

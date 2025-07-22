@@ -41,21 +41,21 @@ class BBCScrapper(ScraperInterface):
 
     def get_content(self):
         try:
-            print("Starting the BBC content fetching...")
+            print("starting the bbc content fetching")
 
             if not self.articles:
                 with open(self.meta_file, 'r') as f:
                     self.articles = json.load(f)
 
             for article in self.articles:
-                print(f"Scraping: {article['title'][:50]}")
-                content = self.get_article_contet(article['url'])
+                print(f"scraping: {article['title'][:50]}")
+                data = self.get_article_content(article['url'])
 
-                if content and content.strip() and content != "nil":
-                    article['content'] = content
-                    print("Got content:", content[:100])
+                if data and data.get("content") and data["content"] != "nil":
+                    article['content'] = data["content"]
+                    article['date_published'] = data.get("date_published")
                 else:
-                    print("Empty content.")
+                    print("empty")
                     continue
 
                 time.sleep(1)
@@ -66,23 +66,33 @@ class BBCScrapper(ScraperInterface):
             with open(self.full_file, 'w') as f:
                 json.dump(self.articles, f, indent=4)
 
-            print("BBC content fetching complete.")
+            print("bbc content fetching complete.")
     
         except Exception as e:
             print(f"Error: {e}")
 
-    def get_article_contet(self, url):
+    def get_article_content(self, url):
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
-            paras = soup.select('div[data-component="text-block"] p')
 
+            paras = soup.select('div[data-component="text-block"] p')
             if not paras:
-                return "nil"
+                return {"content": None, "date_published": None}
+
             full_text = "\n".join(p.get_text(strip=True) for p in paras)
-            return full_text.strip()
-        
+
+            time_tag = soup.find("time")
+            date_published = time_tag["datetime"] if time_tag and "datetime" in time_tag.attrs else None
+
+            return {
+                "content": full_text.strip(),
+                "date_published": date_published
+            }
+
         except Exception as e:
-            print(f"error :{e}")
-            return " "
+            print(f"Error scraping article: {e}")
+            return {"content": None, "date_published": None}
+
+       
