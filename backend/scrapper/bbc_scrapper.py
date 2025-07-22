@@ -41,30 +41,35 @@ class BBCScrapper(ScraperInterface):
 
     def get_content(self):
         try:
-            print("starting the bbc content fetching")
-            
+            print("Starting the BBC content fetching...")
+
             if not self.articles:
                 with open(self.meta_file, 'r') as f:
                     self.articles = json.load(f)
 
             for article in self.articles:
-                print(f"scrapping: {article['title'][:50]}")
+                print(f"Scraping: {article['title'][:50]}")
                 content = self.get_article_contet(article['url'])
-                if content:
+
+                if content and content.strip() and content != "nil":
                     article['content'] = content
+                    print("Got content:", content[:100])
                 else:
-                    print("empty")
+                    print("Empty content.")
                     continue
+
                 time.sleep(1)
 
-            self.articles = [a for a in self.articles if a.get("contents")]
+            
+            self.articles = [a for a in self.articles if a.get("content")]
 
             with open(self.full_file, 'w') as f:
                 json.dump(self.articles, f, indent=4)
-            print("bbc content done")
 
+            print("BBC content fetching complete.")
+    
         except Exception as e:
-            print(f"error: {e}")
+            print(f"Error: {e}")
 
     def get_article_contet(self, url):
         try:
