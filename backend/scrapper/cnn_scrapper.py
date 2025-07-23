@@ -1,3 +1,5 @@
+#fix date
+
 import json
 import time
 import requests
@@ -32,7 +34,7 @@ class CNNScrapper(ScraperInterface):
                     self.articles.append({
                         "title": title,
                         "url": link,
-                        "source": "CNN",
+                        "source_id": "2",
                     })
 
             with open(self.meta_file, 'w') as f:
