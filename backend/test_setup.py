@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test script to verify Flask News Analysis API setup
+Test script to verify Flask News Analysis API setup with PostgreSQL
 """
 
 import requests
@@ -8,6 +8,7 @@ import json
 import time
 import sys
 import os
+import psycopg2
 
 def test_ollama_connection():
     """Test if Ollama is running and accessible"""
@@ -36,6 +37,60 @@ def test_ollama_connection():
         return False
     except Exception as e:
         print(f"❌ Error connecting to Ollama: {str(e)}")
+        return False
+
+def test_postgresql_connection():
+    """Test PostgreSQL database connection"""
+    print("Testing PostgreSQL connection...")
+    
+    # Load environment variables
+    def load_env_file():
+        env_file = '.env'
+        if os.path.exists(env_file):
+            with open(env_file, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        key, value = line.split('=', 1)
+                        os.environ[key] = value
+    
+    load_env_file()
+    
+    db_config = {
+        'host': os.getenv('DB_HOST', 'localhost'),
+        'database': os.getenv('DB_NAME', 'news_analysis'),
+        'user': os.getenv('DB_USER', 'postgres'),
+        'password': os.getenv('DB_PASSWORD', 'postgres'),
+        'port': os.getenv('DB_PORT', '5432')
+    }
+    
+    try:
+        conn = psycopg2.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute("SELECT version()")
+        version = cursor.fetchone()
+        print(f"✅ PostgreSQL is running: {version[0][:50]}...")
+        
+        # Check if tables exist
+        cursor.execute("""
+            SELECT table_name FROM information_schema.tables 
+            WHERE table_schema = 'public'
+        """)
+        tables = cursor.fetchall()
+        table_names = [table[0] for table in tables]
+        
+        if 'articles' in table_names and 'analysis_results' in table_names:
+            print("✅ Required tables exist")
+        else:
+            print("⚠️  Required tables not found (will be created automatically)")
+        
+        cursor.close()
+        conn.close()
+        return True
+        
+    except psycopg2.Error as e:
+        print(f"❌ PostgreSQL connection failed: {str(e)}")
+        print("💡 Run: python3 setup_postgres.py")
         return False
 
 def test_data_files():
@@ -124,29 +179,34 @@ def run_quick_analysis_test():
 
 def main():
     """Main test function"""
-    print("Flask News Analysis API - Setup Test")
+    print("Flask News Analysis API - Setup Test (PostgreSQL)")
     print("=" * 50)
     
     tests_passed = 0
-    total_tests = 4
+    total_tests = 5
     
-    # Test 1: Ollama connection
+    # Test 1: PostgreSQL connection
+    if test_postgresql_connection():
+        tests_passed += 1
+    print()
+    
+    # Test 2: Ollama connection
     if test_ollama_connection():
         tests_passed += 1
     print()
     
-    # Test 2: Data files
+    # Test 3: Data files
     if test_data_files():
         tests_passed += 1
     print()
     
-    # Test 3: Flask app
+    # Test 4: Flask app
     flask_running = test_flask_app()
     if flask_running:
         tests_passed += 1
     print()
     
-    # Test 4: Quick analysis (only if Flask is running)
+    # Test 5: Quick analysis (only if Flask is running)
     if flask_running:
         if run_quick_analysis_test():
             tests_passed += 1
@@ -164,16 +224,18 @@ def main():
     else:
         print("⚠️  Some tests failed. Please check the issues above.")
         
-        if tests_passed < 2:
+        if tests_passed < 3:
             print("\nQuick Setup Guide:")
-            print("1. Install and start Ollama:")
+            print("1. Setup PostgreSQL:")
+            print("   python3 setup_postgres.py")
+            print()
+            print("2. Install and start Ollama:")
             print("   curl -fsSL https://ollama.ai/install.sh | sh")
             print("   ollama pull llama3")
             print("   ollama serve")
             print()
-            print("2. Start the Flask app:")
-            print("   cd backend")
-            print("   python app.py")
+            print("3. Start the Flask app:")
+            print("   ./run.sh")
         
         return 1
 

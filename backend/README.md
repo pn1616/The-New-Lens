@@ -1,10 +1,10 @@
 # Flask News Analysis API
 
-A comprehensive Flask application that integrates with Ollama to perform automated news analysis including clustering, sentiment analysis, and bias detection on scraped news data.
+A comprehensive Flask application that integrates with Ollama and PostgreSQL to perform automated news analysis including clustering, sentiment analysis, and bias detection on scraped news data.
 
 ## Features
 
-- **Data Management**: Automatically loads scraped news data from CNN and BBC into SQLite database
+- **Data Management**: Automatically loads scraped news data from CNN and BBC into PostgreSQL database
 - **Article Clustering**: Groups articles by similar topics using Ollama's LLM capabilities
 - **Sentiment Analysis**: Analyzes emotional tone of articles (-1.0 to 1.0 scale)
 - **Bias Detection**: Identifies potential bias in news articles (0.0 to 1.0 scale)
@@ -13,7 +13,16 @@ A comprehensive Flask application that integrates with Ollama to perform automat
 
 ## Prerequisites
 
-1. **Ollama Installation**: Make sure Ollama is installed and running
+1. **PostgreSQL Database**: Install and configure PostgreSQL
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install postgresql postgresql-contrib
+   sudo systemctl start postgresql
+   sudo systemctl enable postgresql
+   ```
+
+2. **Ollama Installation**: Make sure Ollama is installed and running
    ```bash
    # Install Ollama (if not already installed)
    curl -fsSL https://ollama.ai/install.sh | sh
@@ -25,7 +34,7 @@ A comprehensive Flask application that integrates with Ollama to perform automat
    ollama serve
    ```
 
-2. **Python Dependencies**:
+3. **Python Dependencies**:
    ```bash
    pip install -r requirements.txt
    ```
@@ -37,22 +46,32 @@ A comprehensive Flask application that integrates with Ollama to perform automat
    cd backend
    ```
 
-2. Install dependencies:
+2. Setup PostgreSQL database:
+   ```bash
+   python3 setup_postgres.py
+   ```
+   
+   This will:
+   - Create the `news_analysis` database
+   - Set up database tables and indexes
+   - Create `.env` configuration file
+
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. Ensure your scraped data files exist:
+4. Ensure your scraped data files exist:
    - `scrapper/cnn_content.json`
    - `scrapper/bbc_content.json`
 
-4. Run the Flask application:
+5. Run the Flask application:
    ```bash
-   python app.py
+   ./run.sh
    ```
 
 The application will:
-- Initialize the SQLite database (`news_analysis.db`)
+- Initialize the PostgreSQL database tables
 - Load scraped data into the database
 - Start the Flask server on `http://localhost:5000`
 
@@ -202,14 +221,26 @@ curl -X POST http://localhost:5000/ask \
 
 ## Configuration
 
+### Environment Variables
+The application uses a `.env` file for database configuration:
+```bash
+DB_HOST=localhost
+DB_NAME=news_analysis
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_PORT=5432
+```
+
+### Application Settings
 Key configuration variables in `app.py`:
 - `OLLAMA_API`: Ollama API endpoint (default: `http://localhost:11434/api/generate`)
-- `DATABASE_PATH`: SQLite database file path (default: `news_analysis.db`)
+- `DB_CONFIG`: PostgreSQL connection parameters (loaded from `.env`)
 
 ## Error Handling
 
 The application includes comprehensive error handling:
-- Database connection errors
+- PostgreSQL connection errors
+- Database transaction failures
 - Ollama API failures
 - JSON parsing errors
 - Missing data validation
@@ -225,7 +256,8 @@ The application logs important events:
 ## Performance Considerations
 
 - Articles are truncated for clustering (500 chars) and analysis (1000 chars) to manage token limits
-- Database uses indexes for efficient queries
+- PostgreSQL database uses indexes for efficient queries
+- Connection pooling for database operations
 - Ollama calls include timeouts (120 seconds)
 - Analysis runs sequentially to avoid overwhelming Ollama
 
@@ -236,8 +268,9 @@ The application logs important events:
    - Check if llama3 model is available: `ollama list`
 
 2. **Database Issues**:
-   - Delete `news_analysis.db` to reset database
-   - Check file permissions in backend directory
+   - Run `python3 setup_postgres.py` to recreate database
+   - Check PostgreSQL service: `sudo systemctl status postgresql`
+   - Verify `.env` file contains correct credentials
 
 3. **Missing Data**:
    - Ensure scrapper JSON files exist and contain valid data

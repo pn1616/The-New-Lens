@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 import requests
 import json
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import os
 from datetime import datetime
 import logging
@@ -13,53 +14,100 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load environment variables from .env file if it exists
+def load_env_file():
+    """Load environment variables from .env file"""
+    env_file = '.env'
+    if os.path.exists(env_file):
+        with open(env_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key] = value
+
+load_env_file()
+
 # Configuration
 OLLAMA_API = "http://localhost:11434/api/generate"
-DATABASE_PATH = "news_analysis.db"
+
+# PostgreSQL Configuration
+DB_CONFIG = {
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'news_analysis'),
+    'user': os.getenv('DB_USER', 'postgres'),
+    'password': os.getenv('DB_PASSWORD', 'postgres'),
+    'port': os.getenv('DB_PORT', '5432')
+}
 
 class NewsAnalyzer:
     def __init__(self):
         self.init_database()
         self.load_scraped_data()
     
+    def get_db_connection(self):
+        """Get PostgreSQL database connection"""
+        try:
+            conn = psycopg2.connect(**DB_CONFIG)
+            return conn
+        except psycopg2.Error as e:
+            logger.error(f"Database connection error: {str(e)}")
+            raise
+
     def init_database(self):
-        """Initialize SQLite database with required tables"""
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
-        
-        # Create articles table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS articles (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                title TEXT NOT NULL,
-                url TEXT UNIQUE NOT NULL,
-                source TEXT NOT NULL,
-                content TEXT NOT NULL,
-                date_published TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Create analysis results table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS analysis_results (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                article_id INTEGER,
-                cluster_id INTEGER,
-                cluster_topic TEXT,
-                sentiment_score REAL,
-                sentiment_label TEXT,
-                bias_score REAL,
-                bias_type TEXT,
-                neutral_summary TEXT,
-                analysis_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (article_id) REFERENCES articles (id)
-            )
-        ''')
-        
-        conn.commit()
-        conn.close()
-        logger.info("Database initialized successfully")
+        """Initialize PostgreSQL database with required tables"""
+        try:
+            conn = self.get_db_connection()
+            cursor = conn.cursor()
+            
+            # Create articles table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS articles (
+                    id SERIAL PRIMARY KEY,
+                    title TEXT NOT NULL,
+                    url TEXT UNIQUE NOT NULL,
+                    source TEXT NOT NULL,
+                    content TEXT NOT NULL,
+                    date_published TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create analysis results table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS analysis_results (
+                    id SERIAL PRIMARY KEY,
+                    article_id INTEGER REFERENCES articles(id),
+                    cluster_id INTEGER,
+                    cluster_topic TEXT,
+                    sentiment_score REAL,
+                    sentiment_label TEXT,
+                    bias_score REAL,
+                    bias_type TEXT,
+                    neutral_summary TEXT,
+                    analysis_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create indexes for better performance
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_articles_source ON articles(source)
+            ''')
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_analysis_results_article_id ON analysis_results(article_id)
+            ''')
+            cursor.execute('''
+                CREATE INDEX IF NOT EXISTS idx_analysis_results_cluster_id ON analysis_results(cluster_id)
+            ''')
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            logger.info("PostgreSQL database initialized successfully")
+            
+        except psycopg2.Error as e:
+            logger.error(f"Database initialization error: {str(e)}")
+            raise
     
     def load_scraped_data(self):
         """Load scraped data from JSON files into database"""
@@ -73,13 +121,14 @@ class NewsAnalyzer:
                 bbc_data = json.load(f)
             
             # Insert data into database
-            conn = sqlite3.connect(DATABASE_PATH)
+            conn = self.get_db_connection()
             cursor = conn.cursor()
             
             for article in cnn_data + bbc_data:
                 cursor.execute('''
-                    INSERT OR IGNORE INTO articles (title, url, source, content, date_published)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO articles (title, url, source, content, date_published)
+                    VALUES (%s, %s, %s, %s, %s)
+                    ON CONFLICT (url) DO NOTHING
                 ''', (
                     article.get('title', ''),
                     article.get('url', ''),
@@ -89,8 +138,9 @@ class NewsAnalyzer:
                 ))
             
             conn.commit()
+            cursor.close()
             conn.close()
-            logger.info("Scraped data loaded into database successfully")
+            logger.info("Scraped data loaded into PostgreSQL database successfully")
             
         except Exception as e:
             logger.error(f"Error loading scraped data: {str(e)}")
@@ -114,46 +164,48 @@ class NewsAnalyzer:
     
     def cluster_articles(self) -> Dict[str, Any]:
         """Cluster articles by topic using Ollama"""
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
-        
-        # Get all articles
-        cursor.execute("SELECT id, title, content FROM articles")
-        articles = cursor.fetchall()
-        
-        if not articles:
-            return {"error": "No articles found in database"}
-        
-        # Prepare articles for clustering
-        article_summaries = []
-        for article_id, title, content in articles:
-            # Truncate content for clustering (first 500 chars)
-            summary = f"Title: {title}\nContent: {content[:500]}..."
-            article_summaries.append((article_id, title, summary))
-        
-        # Create clustering prompt
-        clustering_prompt = f"""
-        I have {len(article_summaries)} news articles. Please analyze them and group them into clusters based on similar topics or themes.
-        
-        Articles:
-        {chr(10).join([f"{i+1}. {summary}" for i, (_, _, summary) in enumerate(article_summaries)])}
-        
-        Please provide the clustering results in the following JSON format:
-        {{
-            "clusters": [
-                {{
-                    "cluster_id": 1,
-                    "topic": "Topic Name",
-                    "description": "Brief description of the cluster theme",
-                    "article_indices": [1, 3, 5]
-                }}
-            ]
-        }}
-        
-        Only return the JSON, no additional text.
-        """
-        
         try:
+            conn = self.get_db_connection()
+            cursor = conn.cursor()
+            
+            # Get all articles
+            cursor.execute("SELECT id, title, content FROM articles")
+            articles = cursor.fetchall()
+            
+            if not articles:
+                cursor.close()
+                conn.close()
+                return {"error": "No articles found in database"}
+            
+            # Prepare articles for clustering
+            article_summaries = []
+            for article_id, title, content in articles:
+                # Truncate content for clustering (first 500 chars)
+                summary = f"Title: {title}\nContent: {content[:500]}..."
+                article_summaries.append((article_id, title, summary))
+            
+            # Create clustering prompt
+            clustering_prompt = f"""
+            I have {len(article_summaries)} news articles. Please analyze them and group them into clusters based on similar topics or themes.
+            
+            Articles:
+            {chr(10).join([f"{i+1}. {summary}" for i, (_, _, summary) in enumerate(article_summaries)])}
+            
+            Please provide the clustering results in the following JSON format:
+            {{
+                "clusters": [
+                    {{
+                        "cluster_id": 1,
+                        "topic": "Topic Name",
+                        "description": "Brief description of the cluster theme",
+                        "article_indices": [1, 3, 5]
+                    }}
+                ]
+            }}
+            
+            Only return the JSON, no additional text.
+            """
+            
             clustering_result = self.call_ollama(clustering_prompt)
             
             # Parse clustering result
@@ -172,38 +224,43 @@ class NewsAnalyzer:
                             article_id = article_summaries[article_index - 1][0]
                             
                             cursor.execute('''
-                                INSERT OR REPLACE INTO analysis_results 
+                                INSERT INTO analysis_results 
                                 (article_id, cluster_id, cluster_topic) 
-                                VALUES (?, ?, ?)
+                                VALUES (%s, %s, %s)
+                                ON CONFLICT (article_id) DO UPDATE SET
+                                cluster_id = EXCLUDED.cluster_id,
+                                cluster_topic = EXCLUDED.cluster_topic
                             ''', (article_id, cluster_id, topic))
                 
                 conn.commit()
+                cursor.close()
                 conn.close()
                 return {"success": True, "clusters": clusters_data}
             else:
+                cursor.close()
                 conn.close()
                 return {"error": "Failed to parse clustering results"}
                 
         except Exception as e:
-            conn.close()
             logger.error(f"Clustering error: {str(e)}")
             return {"error": f"Clustering failed: {str(e)}"}
     
     def analyze_sentiment_and_bias(self) -> Dict[str, Any]:
         """Perform sentiment analysis and bias detection on clustered articles"""
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
-        
-        # Get articles with cluster information
-        cursor.execute('''
-            SELECT a.id, a.title, a.content, ar.cluster_id, ar.cluster_topic
-            FROM articles a
-            JOIN analysis_results ar ON a.id = ar.article_id
-            WHERE ar.cluster_id IS NOT NULL
-        ''')
-        
-        articles = cursor.fetchall()
-        results = []
+        try:
+            conn = self.get_db_connection()
+            cursor = conn.cursor()
+            
+            # Get articles with cluster information
+            cursor.execute('''
+                SELECT a.id, a.title, a.content, ar.cluster_id, ar.cluster_topic
+                FROM articles a
+                JOIN analysis_results ar ON a.id = ar.article_id
+                WHERE ar.cluster_id IS NOT NULL
+            ''')
+            
+            articles = cursor.fetchall()
+            results = []
         
         for article_id, title, content, cluster_id, cluster_topic in articles:
             # Sentiment Analysis
@@ -271,13 +328,13 @@ class NewsAnalyzer:
                 # Update database with analysis results
                 cursor.execute('''
                     UPDATE analysis_results SET
-                        sentiment_score = ?,
-                        sentiment_label = ?,
-                        bias_score = ?,
-                        bias_type = ?,
-                        neutral_summary = ?,
+                        sentiment_score = %s,
+                        sentiment_label = %s,
+                        bias_score = %s,
+                        bias_type = %s,
+                        neutral_summary = %s,
                         analysis_timestamp = CURRENT_TIMESTAMP
-                    WHERE article_id = ?
+                    WHERE article_id = %s
                 ''', (
                     sentiment_data.get("sentiment_score", 0.0),
                     sentiment_data.get("sentiment_label", "neutral"),
@@ -297,14 +354,19 @@ class NewsAnalyzer:
                     "neutral_summary": neutral_summary.strip()
                 })
                 
-            except Exception as e:
-                logger.error(f"Error analyzing article {article_id}: {str(e)}")
-                continue
-        
-        conn.commit()
-        conn.close()
-        
-        return {"success": True, "analyzed_articles": len(results), "results": results}
+                except Exception as e:
+                    logger.error(f"Error analyzing article {article_id}: {str(e)}")
+                    continue
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return {"success": True, "analyzed_articles": len(results), "results": results}
+            
+        except Exception as e:
+            logger.error(f"Analysis error: {str(e)}")
+            return {"error": f"Analysis failed: {str(e)}"}
     
     def _extract_json(self, text: str) -> Dict[str, Any]:
         """Extract JSON from Ollama response"""
@@ -319,55 +381,61 @@ class NewsAnalyzer:
     
     def get_analysis_summary(self) -> Dict[str, Any]:
         """Get summary of all analysis results"""
-        conn = sqlite3.connect(DATABASE_PATH)
-        cursor = conn.cursor()
+        try:
+            conn = self.get_db_connection()
+            cursor = conn.cursor()
+            
+            # Get cluster summary
+            cursor.execute('''
+                SELECT cluster_id, cluster_topic, COUNT(*) as article_count,
+                       AVG(sentiment_score) as avg_sentiment,
+                       AVG(bias_score) as avg_bias
+                FROM analysis_results 
+                WHERE cluster_id IS NOT NULL
+                GROUP BY cluster_id, cluster_topic
+                ORDER BY cluster_id
+            ''')
+            
+            clusters = cursor.fetchall()
+            
+            # Get overall statistics
+            cursor.execute('''
+                SELECT 
+                    COUNT(*) as total_articles,
+                    AVG(sentiment_score) as overall_sentiment,
+                    AVG(bias_score) as overall_bias,
+                    COUNT(DISTINCT cluster_id) as total_clusters
+                FROM analysis_results
+                WHERE sentiment_score IS NOT NULL
+            ''')
+            
+            stats = cursor.fetchone()
+            
+            cursor.close()
+            conn.close()
         
-        # Get cluster summary
-        cursor.execute('''
-            SELECT cluster_id, cluster_topic, COUNT(*) as article_count,
-                   AVG(sentiment_score) as avg_sentiment,
-                   AVG(bias_score) as avg_bias
-            FROM analysis_results 
-            WHERE cluster_id IS NOT NULL
-            GROUP BY cluster_id, cluster_topic
-            ORDER BY cluster_id
-        ''')
-        
-        clusters = cursor.fetchall()
-        
-        # Get overall statistics
-        cursor.execute('''
-            SELECT 
-                COUNT(*) as total_articles,
-                AVG(sentiment_score) as overall_sentiment,
-                AVG(bias_score) as overall_bias,
-                COUNT(DISTINCT cluster_id) as total_clusters
-            FROM analysis_results
-            WHERE sentiment_score IS NOT NULL
-        ''')
-        
-        stats = cursor.fetchone()
-        
-        conn.close()
-        
-        return {
-            "overall_statistics": {
-                "total_articles": stats[0] if stats else 0,
-                "overall_sentiment": round(stats[1], 3) if stats and stats[1] else 0,
-                "overall_bias": round(stats[2], 3) if stats and stats[2] else 0,
-                "total_clusters": stats[3] if stats else 0
-            },
-            "clusters": [
-                {
-                    "cluster_id": cluster[0],
-                    "topic": cluster[1],
-                    "article_count": cluster[2],
-                    "avg_sentiment": round(cluster[3], 3) if cluster[3] else 0,
-                    "avg_bias": round(cluster[4], 3) if cluster[4] else 0
-                }
-                for cluster in clusters
-            ]
-        }
+            return {
+                "overall_statistics": {
+                    "total_articles": stats[0] if stats else 0,
+                    "overall_sentiment": round(stats[1], 3) if stats and stats[1] else 0,
+                    "overall_bias": round(stats[2], 3) if stats and stats[2] else 0,
+                    "total_clusters": stats[3] if stats else 0
+                },
+                "clusters": [
+                    {
+                        "cluster_id": cluster[0],
+                        "topic": cluster[1],
+                        "article_count": cluster[2],
+                        "avg_sentiment": round(cluster[3], 3) if cluster[3] else 0,
+                        "avg_bias": round(cluster[4], 3) if cluster[4] else 0
+                    }
+                    for cluster in clusters
+                ]
+            }
+            
+        except Exception as e:
+            logger.error(f"Summary error: {str(e)}")
+            return {"error": f"Failed to get summary: {str(e)}"}
 
 # Initialize analyzer
 analyzer = NewsAnalyzer()

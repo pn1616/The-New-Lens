@@ -56,9 +56,10 @@ A comprehensive **Flask web application** that integrates with **Ollama (LLaMA 3
 ## Technical Stack
 
 - **Backend**: Flask (Python)
-- **Database**: SQLite with two main tables:
+- **Database**: PostgreSQL with two main tables:
   - `articles` - Stores news article data
   - `analysis_results` - Stores AI analysis results
+- **Database Driver**: psycopg2-binary for PostgreSQL connectivity
 - **AI Engine**: Ollama with LLaMA 3 model
 - **Data Format**: JSON input, REST API output
 
@@ -75,7 +76,7 @@ A comprehensive **Flask web application** that integrates with **Ollama (LLaMA 3
 
 ## Data Flow
 
-1. **Data Loading**: Scraped articles from CNN/BBC loaded into SQLite
+1. **Data Loading**: Scraped articles from CNN/BBC loaded into PostgreSQL
 2. **Clustering**: LLaMA 3 groups articles by similar topics
 3. **Analysis**: Each article analyzed for sentiment and bias
 4. **Summarization**: Neutral POV summaries generated
@@ -84,11 +85,13 @@ A comprehensive **Flask web application** that integrates with **Ollama (LLaMA 3
 ## Files Created
 
 ### Core Application
-- `app.py` - Main Flask application (461 lines)
-- `requirements.txt` - Python dependencies
+- `app.py` - Main Flask application with PostgreSQL support
+- `requirements.txt` - Python dependencies (includes psycopg2)
 
-### Database
-- `news_analysis.db` - SQLite database (auto-created)
+### Database Setup
+- `setup_postgres.py` - PostgreSQL database setup script
+- `.env` - Database configuration file (created by setup)
+- `install_deps.sh` - Dependency installation script
 
 ### Scripts & Tools
 - `run.sh` - Easy startup script
@@ -102,10 +105,11 @@ A comprehensive **Flask web application** that integrates with **Ollama (LLaMA 3
 
 ## Usage Examples
 
-### Start the Server
+### Setup and Start
 ```bash
 cd backend
-./run.sh
+python3 setup_postgres.py  # Setup PostgreSQL database
+./run.sh                   # Start the server
 ```
 
 ### Run Full Analysis
@@ -146,7 +150,7 @@ curl http://localhost:5000/summary
 
 ✅ **Flask Backend** - Complete Flask application with REST API  
 ✅ **Ollama Integration** - Full integration with LLaMA 3 model  
-✅ **Database Storage** - SQLite for persistent data storage  
+✅ **Database Storage** - PostgreSQL for robust data storage  
 ✅ **Data Clustering** - AI-powered topic clustering  
 ✅ **Sentiment Analysis** - Emotional tone analysis  
 ✅ **Bias Detection** - Media bias identification  
@@ -162,4 +166,4 @@ The application is **production-ready** with:
 - Usage examples
 - Complete documentation
 
-Simply ensure Ollama is running with LLaMA 3, then execute `./run.sh` to start analyzing news data!
+Simply setup PostgreSQL with `python3 setup_postgres.py`, ensure Ollama is running with LLaMA 3, then execute `./run.sh` to start analyzing news data!

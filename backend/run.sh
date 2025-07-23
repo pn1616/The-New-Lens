@@ -17,8 +17,14 @@ source venv/bin/activate
 # Install dependencies if needed
 if [ ! -f "venv/.deps_installed" ]; then
     echo "📥 Installing dependencies..."
-    pip install -r requirements.txt
-    touch venv/.deps_installed
+    ./install_deps.sh
+fi
+
+# Check PostgreSQL setup
+if [ ! -f ".env" ]; then
+    echo "⚠️  PostgreSQL not configured!"
+    echo "   Run: python3 setup_postgres.py"
+    exit 1
 fi
 
 # Check if scraped data exists
