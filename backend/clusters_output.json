@@ -1,0 +1,80 @@
+[
+  {
+    "cluster_date": "2025-07-23",
+    "theme": "Vice-President Election and Related Developments",
+    "articles": [
+      {
+        "news_id": 1,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 2,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 3,
+        "sentiment": "Positive",
+        "bias": "Right"
+      }
+    ],
+    "summary": "The Election Commission has announced the process for holding the Vice-President election, following former V-P Jagdeep Dhankhar's sudden resignation. Various names are being floated as potential candidates."
+  },
+  {
+    "cluster_date": "2025-07-23",
+    "theme": "Justice Yashwant Varma and Supreme Court Developments",
+    "articles": [
+      {
+        "news_id": 4,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 5,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 6,
+        "sentiment": "Negative",
+        "bias": "Left"
+      }
+    ],
+    "summary": "Chief Justice B.R. Gavai has recused himself from hearing a plea filed by Justice Yashwant Varma, who is challenging the findings of an in-house Supreme Court committee report. A new bench will hear the petition."
+  },
+  {
+    "cluster_date": "2025-07-23",
+    "theme": "Miscellaneous News and Updates",
+    "articles": [
+      {
+        "news_id": 7,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 8,
+        "sentiment": "Positive",
+        "bias": "Center"
+      },
+      {
+        "news_id": 9,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      }
+    ],
+    "summary": "Prime Minister Narendra Modi bid farewell to former Vice-President Jagdeep Dhankhar, while Proton launched an AI assistant called Lumo. Infosys announced its Q1FY26 financial results, with a rise in voluntary attrition rate."
+  },
+  {
+    "cluster_date": "2025-07-23",
+    "theme": "Supreme Court Ruling on Ex-parte Gag Order",
+    "articles": [
+      {
+        "news_id": 10,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      }
+    ],
+    "summary": "The Supreme Court refused to entertain a direct challenge to an ex-parte gag order restraining media from publishing defamatory content regarding the Sri Manjunathaswamy temple and the 'Dharmasthala Burial' case."
+  }
+]
