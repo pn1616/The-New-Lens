@@ -104,7 +104,6 @@ def call_llama(prompt):
     output, _ = process.communicate(full_prompt)
     return output.strip()
 
-"""
 # === Update DB: mark clustered articles ===
 def mark_articles_clustered(article_ids):
     if not article_ids:
@@ -118,45 +117,43 @@ def mark_articles_clustered(article_ids):
     conn.commit()
     cur.close()
     conn.close()
-"""
 
 # === Main Runner ===
 def cluster_articles():
     all_articles = fetch_articles_from_db()
     print(f"Fetched {len(all_articles)} articles from DB")
 
-    # batch_size = 10
-    # clustered_data = []
-    # clustered_ids = set()
+    batch_size = 10
+    clustered_data = []
+    clustered_ids = set()
 
-    # for i in range(0, len(all_articles), batch_size):
-    #     batch = all_articles[i:i+batch_size]
-    #     print(f"\nProcessing batch {i//batch_size + 1} with {len(batch)} articles")
+    for i in range(0, len(all_articles), batch_size):
+        batch = all_articles[i:i+batch_size]
+        print(f"\nProcessing batch {i//batch_size + 1} with {len(batch)} articles")
 
     prompt = build_prompt(all_articles)
     response = call_llama(prompt)
 
     try:
         clusters = json.loads(response)
-        # clustered_data.extend(clusters)
+        clustered_data.extend(clusters)
 
-        # for cluster in clusters:
-        #     clustered_ids.update(cluster["articles"])
+        for cluster in clusters:
+            clustered_ids.update(cluster["articles"])
 
     except json.JSONDecodeError:
         print("Failed to parse LLaMA output:")
         print(response)
         return
 
-    # Save to file
     with open("clusters_output.json", "w") as f:
         json.dump(clusters, f, indent=2)
     print("\nClustered data saved to clusters_output.json")
 
     # Update DB
-    # if clustered_ids:
-    #     mark_articles_clustered(list(clustered_ids))
-    #     print(f"Marked {len(clustered_ids)} articles as clustered in DB")
+    if clustered_ids:
+         mark_articles_clustered(list(clustered_ids))
+         print(f"Marked {len(clustered_ids)} articles as clustered in DB")
 
 if __name__ == "__main__":
     cluster_articles()

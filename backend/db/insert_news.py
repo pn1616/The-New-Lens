@@ -14,8 +14,6 @@ cur = conn.cursor()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
 JSON_FILES = [
-    #os.path.join(BASE_DIR, "scrapper", "cnn_content.json"),
-    #os.path.join(BASE_DIR, "scrapper", "bbc_content.json"),
     os.path.join(BASE_DIR,"new.json")
 ]
 for filename in JSON_FILES:
