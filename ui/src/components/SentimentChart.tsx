@@ -9,7 +9,9 @@ const SentimentPieChart = () => {
     queryKey: ["sentiment-data"],
     queryFn: async () => {
       const res = await axios.get("http://localhost:5000/api/articles");
+      console.log("Fetched sentiment data:", res.data);
       return res.data;
+      
     },
   });
 
@@ -32,26 +34,29 @@ const SentimentPieChart = () => {
   if (error) return <p>Error loading data.</p>;
 
   return (
-    <div className="w-full h-[300px]">
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={pieData}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {pieData.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="w-full">
+      <h2 className="text-xl font-semibold text-center mb-4">Sentiment Analysis</h2>
+      <div className="w-full h-[300px]">
+        <ResponsiveContainer>
+          <PieChart>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              label
+            >
+              {pieData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

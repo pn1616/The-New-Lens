@@ -21,19 +21,22 @@ const GroupedBarChart = () => {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: 400 }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="source" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="left" stackId="a" fill="#FF6384" />
-          <Bar dataKey="center" stackId="a" fill="#36A2EB" />
-          <Bar dataKey="right" stackId="a" fill="#FFCE56" />
-        </BarChart>
-      </ResponsiveContainer>
+    <div style={{ width: '100%' }}>
+      <h2 className="text-xl font-semibold text-center mb-4">Bias Distribution by Source</h2>
+      <div style={{ width: '100%', height: 400 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="source" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="left" stackId="a" fill="#FF6384" />
+            <Bar dataKey="center" stackId="a" fill="#36A2EB" />
+            <Bar dataKey="right" stackId="a" fill="#FFCE56" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 };

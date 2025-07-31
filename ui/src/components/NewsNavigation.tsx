@@ -7,12 +7,22 @@ interface NewsNavigationProps {
 }
 
 const NewsNavigation = ({ sources, onTabSelect }: NewsNavigationProps) => {
-  const [activeTab, setActiveTab] = useState('news');
-  const tabs = ['neutral', ...sources];
-
+  // Remove duplicates using Set
+  const uniqueSources = [...new Set(sources)];
+  const tabs = ['neutral', ...uniqueSources];
+  const [activeTab, setActiveTab] = useState(tabs[0]); // Initialize with first tab
+  
   useEffect(() => {
     onTabSelect(activeTab);
-  }, [activeTab]);
+    console.log(`Active tab changed to: ${activeTab}`);
+  }, [activeTab, onTabSelect]);
+
+  // Reset to first tab when sources change
+  useEffect(() => {
+    if (tabs.length > 0 && !tabs.includes(activeTab)) {
+      setActiveTab(tabs[0]);
+    }
+  }, [sources]);
 
   return (
     <div className="px-6 py-4 border-b bg-sidebar-accent">

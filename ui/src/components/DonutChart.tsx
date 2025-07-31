@@ -50,7 +50,7 @@ const DonutChart = () => {
 
   return (
     <div className="p-4">
-      
+      <h2 className="text-xl font-semibold text-center mb-4">Source Distribution</h2>
       <ResponsiveContainer width={250} height={250}>
         <PieChart>
           <Pie

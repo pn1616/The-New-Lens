@@ -59,18 +59,18 @@ def call_llama(prompt):
         1. Cluster Articles
         - Group similar articles from different sources (use source_id to differentiate)
         -  cluster_date MUST be today's date.
-        - Base clustering on topic similarity, shared entities, timeframes, and event relationships.
+        - Base clustering on topic similarity, shared entities, and event relationships.
+        - MUST NOT cluster articles that are not of the same topic.
         - Ensure articles in a cluster represent the same story. Handle edge cases carefully.
 
         2. Generate Cluster Summaries
-        - Write one unbiased summary per cluster combining facts from all articles.
-        - Include key details: who, what, when, where, why, and how.
-        - Length: 150–300 words.
+        - Write one unbiased and neutral point of view summary per cluster combining facts from all articles.
+        - Length: MUST BE ATLEAST 200 WORDS. 
         - Highlight contradictions neutrally.
 
         3. Analyze Each Article
         - Sentiment
-        - Overall sentiment: Positive, Negative, Neutral, or Mixed
+        - Overall sentiment: Positive, Negative, Neutral.
         - Bias
         - Bias direction: Left, Right, Center, or Neutral
 
@@ -81,15 +81,18 @@ def call_llama(prompt):
             "theme": "Concise cluster title",
             "articles": [
               {{
-                "news_id": "the news_id of the article as an integer",
-                "sentiment": "Positive" | "Negative" | "Neutral" | "Mixed",
-                "bias": "Left" | "Right" | "Center" | "Neutral"
+                "news_id": 123,
+                "sentiment": "Positive",
+                "bias": "Left"
               }},
-              ...
+              {{
+                "news_id": 456,
+                "sentiment": "Negative",
+                "bias": "Right"
+              }}
             ],
-            "summary": "Concise summary of the cluster"
-          }},
-          ...
+            "summary": "Neutral point of view summary of the cluster atleast 200 words"
+          }}
         ]
 
         {prompt}
@@ -118,42 +121,71 @@ def mark_articles_clustered(article_ids):
     cur.close()
     conn.close()
 
+# === Update DB: mark analysed articles ===
+def mark_articles_analysed(article_ids):
+    if not article_ids:
+        return
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE news SET is_analysed = TRUE WHERE news_id = ANY(%s)",
+        (article_ids,)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
 # === Main Runner ===
 def cluster_articles():
     all_articles = fetch_articles_from_db()
     print(f"Fetched {len(all_articles)} articles from DB")
 
     batch_size = 10
-    clustered_data = []
-    clustered_ids = set()
+    all_clustered_data = []
+    all_clustered_ids = set()
 
     for i in range(0, len(all_articles), batch_size):
         batch = all_articles[i:i+batch_size]
-        print(f"\nProcessing batch {i//batch_size + 1} with {len(batch)} articles")
+        batch_num = i//batch_size + 1
+        print(f"\nProcessing batch {batch_num} with {len(batch)} articles")
+        
+        # Build prompt for this specific batch
+        prompt = build_prompt(batch)
+        
+        # Call LLaMA for this batch
+        response = call_llama(prompt)
+        
+        try:
+            clusters = json.loads(response)
+            all_clustered_data.extend(clusters)
+            
+            batch_ids = set()
+            for cluster in clusters:
+                for article in cluster["articles"]:
+                    article_id = article["news_id"]
+                    all_clustered_ids.add(article_id)
+                    batch_ids.add(article_id)
+            
+            print(f"✓ Batch {batch_num} processed successfully - {len(batch_ids)} articles clustered")
+            
+        except json.JSONDecodeError:
+            print(f"✗ Failed to parse LLaMA output for batch {batch_num}:")
+            print(response)
+            print("Continuing with next batch...")
+            continue
 
-    prompt = build_prompt(all_articles)
-    response = call_llama(prompt)
-
-    try:
-        clusters = json.loads(response)
-        clustered_data.extend(clusters)
-
-        for cluster in clusters:
-            clustered_ids.update(cluster["articles"])
-
-    except json.JSONDecodeError:
-        print("Failed to parse LLaMA output:")
-        print(response)
-        return
-
+    # Save all clustered data to file
     with open("clusters_output.json", "w") as f:
-        json.dump(clusters, f, indent=2)
-    print("\nClustered data saved to clusters_output.json")
+        json.dump(all_clustered_data, f, indent=2)
+    print(f"\n✓ All clustered data saved to clusters_output.json")
 
-    # Update DB
-    if clustered_ids:
-         mark_articles_clustered(list(clustered_ids))
-         print(f"Marked {len(clustered_ids)} articles as clustered in DB")
+    # Update DB for all processed articles
+    if all_clustered_ids:
+         mark_articles_clustered(list(all_clustered_ids))
+         mark_articles_analysed(list(all_clustered_ids))
+         print(f"✓ Marked {len(all_clustered_ids)} articles as clustered and analysed in DB")
+    else:
+         print("✗ No articles were successfully processed")
 
 if __name__ == "__main__":
     cluster_articles()

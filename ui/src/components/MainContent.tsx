@@ -9,7 +9,7 @@ interface MainContentProps {
 }
 
 const MainContent = ({ clusterId }: MainContentProps) => {
-  const [selectedTab, setSelectedTab] = useState('news');
+  const [selectedTab, setSelectedTab] = useState('neutral');
 
   const {
     data: clusterData,
@@ -34,13 +34,14 @@ const MainContent = ({ clusterId }: MainContentProps) => {
     queryKey: ['articleDetails', selectedArticle?.article_id],
     queryFn: () =>
       axios.get(`http://localhost:5000/api/article/${selectedArticle.article_id}`).then((res) => res.data),
-    enabled: selectedTab !== 'news' && !!selectedArticle?.article_id,
+      
+    enabled: selectedTab !== 'neutral' && !!selectedArticle?.article_id,
   });
 
   return (
-    <div className="flex-1 p-6">
-      <Card className="h-full">
-        <CardHeader className="pb-0">
+    <div className="flex-1 p-6 flex flex-col h-screen">
+      <Card className="flex-1 flex flex-col">
+        <CardHeader className="pb-0 flex-shrink-0">
           <CardTitle className="mb-2">News Content</CardTitle>
           {clusterData && clusterData.sources && (
             <NewsNavigation
@@ -49,9 +50,9 @@ const MainContent = ({ clusterId }: MainContentProps) => {
             />
           )}
         </CardHeader>
-        <CardContent className="overflow-y-auto max-h-[32rem] text-left">
+        <CardContent className="flex-1 overflow-y-auto text-left">
           {!clusterId ? (
-            <div className="flex items-center justify-center h-96 text-muted-foreground">
+            <div className="flex items-center justify-center h-full text-muted-foreground">
               <div className="text-center">
                 <p className="text-lg mb-2">Select a news item to read</p>
                 <p className="text-sm">
@@ -63,7 +64,7 @@ const MainContent = ({ clusterId }: MainContentProps) => {
             <p>Loading cluster details...</p>
           ) : clusterError ? (
             <p className="text-red-500">Error loading cluster details.</p>
-          ) : selectedTab === 'news' ? (
+          ) : selectedTab === 'neutral' ? (
             <div className="text-base whitespace-pre-line leading-relaxed">
               {clusterData.summary}
             </div>

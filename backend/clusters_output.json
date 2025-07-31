@@ -1,7 +1,7 @@
 [
   {
     "cluster_date": "2025-07-23",
-    "theme": "Vice-President Election and Related Developments",
+    "theme": "Vice Presidential Election and Related Developments",
     "articles": [
       {
         "news_id": 1,
@@ -16,14 +16,14 @@
       {
         "news_id": 3,
         "sentiment": "Positive",
-        "bias": "Right"
+        "bias": "Left"
       }
     ],
-    "summary": "The Election Commission has announced the process for holding the Vice-President election, following former V-P Jagdeep Dhankhar's sudden resignation. Various names are being floated as potential candidates."
+    "summary": "The Election Commission has started the process for holding the election for the post of Vice-President, following the sudden resignation of former V-P Jagdeep Dhankhar. Several names are floating as probable frontrunners in the vice presidential race. The election must be conducted 'as soon as possible' in case of vacancy. Meanwhile, the Supreme Court has refused to entertain a plea challenging an ex-parte gag order restraining media from publishing defamatory content. In related news, Chief Justice BR Gavai has recused himself from hearing a plea filed by Justice Yashwant Varma, who is challenging the findings of an in-house Supreme Court committee report."
   },
   {
     "cluster_date": "2025-07-23",
-    "theme": "Justice Yashwant Varma and Supreme Court Developments",
+    "theme": "Supreme Court and Related Developments",
     "articles": [
       {
         "news_id": 4,
@@ -38,20 +38,15 @@
       {
         "news_id": 6,
         "sentiment": "Negative",
-        "bias": "Left"
+        "bias": "Right"
       }
     ],
-    "summary": "Chief Justice B.R. Gavai has recused himself from hearing a plea filed by Justice Yashwant Varma, who is challenging the findings of an in-house Supreme Court committee report. A new bench will hear the petition."
+    "summary": "The Chief Justice of India, BR Gavai, has recused himself from hearing a plea filed by Justice Yashwant Varma, who is challenging the findings of an in-house Supreme Court committee report. In related news, the Central government is working to constitute a committee to probe allegations against Justice Yashwant Varma in the alleged burnt cash recovery case."
   },
   {
     "cluster_date": "2025-07-23",
-    "theme": "Miscellaneous News and Updates",
+    "theme": "Proton and Infosys News",
     "articles": [
-      {
-        "news_id": 7,
-        "sentiment": "Neutral",
-        "bias": "Center"
-      },
       {
         "news_id": 8,
         "sentiment": "Positive",
@@ -63,18 +58,228 @@
         "bias": "Center"
       }
     ],
-    "summary": "Prime Minister Narendra Modi bid farewell to former Vice-President Jagdeep Dhankhar, while Proton launched an AI assistant called Lumo. Infosys announced its Q1FY26 financial results, with a rise in voluntary attrition rate."
+    "summary": "Proton has launched an AI assistant called Lumo, designed to preserve user privacy. Lumo can summarize documents, generate code, write emails, and more, while storing data locally on users' devices. Proton protects this information using zero-knowledge proof-based encryption. Meanwhile, Infosys announced its Q1FY26 financial results, with a voluntary attrition rate rising to 14.4% in June 2025."
   },
   {
-    "cluster_date": "2025-07-23",
-    "theme": "Supreme Court Ruling on Ex-parte Gag Order",
+    "cluster_date": "2025-07-30",
+    "theme": "Indian Economy and Politics",
     "articles": [
       {
-        "news_id": 10,
+        "news_id": 11,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 12,
+        "sentiment": "Positive",
+        "bias": "Right"
+      },
+      {
+        "news_id": 13,
+        "sentiment": "Negative",
+        "bias": "Left"
+      },
+      {
+        "news_id": 14,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 15,
+        "sentiment": "Positive",
+        "bias": "Right"
+      }
+    ],
+    "summary": "The Indian government has put terrorism on the global agenda, according to External Affairs Minister S Jaishankar. Prime Minister Narendra Modi has also emphasized that no world leader asked India to stop its military operation in Pakistan. Meanwhile, US President Donald Trump has criticized India's economy, suggesting it is 'dead.' However, Indian and Russian economies are expected to grow together. The Malegaon blast case verdict has been pronounced, acquitting all accused. The NASA-ISRO earth observation satellite NISAR has been launched."
+  },
+  {
+    "cluster_date": "2025-07-30",
+    "theme": "Malegaon Blast Case",
+    "articles": [
+      {
+        "news_id": 16,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 17,
+        "sentiment": "Positive",
+        "bias": "Right"
+      },
+      {
+        "news_id": 18,
+        "sentiment": "Negative",
+        "bias": "Left"
+      }
+    ],
+    "summary": "A special court in Mumbai has acquitted all accused in the 2008 Malegaon blast case, including former BJP MP Pragya Singh Thakur and Lt Col Prasad Purohit. The verdict brings an end to a 17-year-long investigation."
+  },
+  {
+    "cluster_date": "2025-07-30",
+    "theme": "Space Exploration",
+    "articles": [
+      {
+        "news_id": 19,
+        "sentiment": "Positive",
+        "bias": "Center"
+      },
+      {
+        "news_id": 20,
         "sentiment": "Neutral",
         "bias": "Center"
       }
     ],
-    "summary": "The Supreme Court refused to entertain a direct challenge to an ex-parte gag order restraining media from publishing defamatory content regarding the Sri Manjunathaswamy temple and the 'Dharmasthala Burial' case."
+    "summary": "The NASA-ISRO Synthetic Aperture Radar (NISAR) satellite was successfully launched on July 30, 2025. The satellite is expected to scan every piece of Earth and will be used for earth observation."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Kerala Nuns' Arrest and Related Controversies",
+    "articles": [
+      {
+        "news_id": 21,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 22,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 23,
+        "sentiment": "Positive",
+        "bias": "Left"
+      }
+    ],
+    "summary": "The arrest of two Kerala nuns in Chhattisgarh has sparked a political controversy, with the Church of South India (CSI) Synod Secretariat condemning the arrests and demanding their immediate release. The CSI has also expressed concern over religious intimidation. Meanwhile, a woman who was coerced into giving an adverse statement against the nuns has spoken out about the ordeal. Despite these developments, there are concerns that the arrests may be part of a larger effort to target Christians in India."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Pahalgam Terror Attack and Related Controversies",
+    "articles": [
+      {
+        "news_id": 24,
+        "sentiment": "Negative",
+        "bias": "Right"
+      },
+      {
+        "news_id": 25,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      }
+    ],
+    "summary": "The Pahalgam terror attack, in which three Pakistani terrorists were killed, has sparked concerns over the extent of the terrorist network operating in Kashmir. The use of ultra-high frequency wireless sets to communicate with other operatives and their aides across the border raises questions about the effectiveness of security measures in place."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Air India Group Safety Audit and Related Controversies",
+    "articles": [
+      {
+        "news_id": 26,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 27,
+        "sentiment": "Negative",
+        "bias": "Right"
+      }
+    ],
+    "summary": "An audit by the Directorate General of Civil Aviation (DGCA) has identified several critical safety breaches in Air India Group airlines. The regulator has claimed that a high number of findings is entirely normal, but critics are raising concerns over the impact on air travel safety."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Dharmasthala Mass Burial Investigation and Related Controversies",
+    "articles": [
+      {
+        "news_id": 28,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 29,
+        "sentiment": "Positive",
+        "bias": "Left"
+      },
+      {
+        "news_id": 30,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      }
+    ],
+    "summary": "The investigation into mass burials in Dharmasthala has yielded a significant breakthrough, with partial skeletal remains found at site number 6. The operation, which took place over two days, did not yield any confirmed evidence of human remains on the first day but recovered documents on the second day."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Supreme Court Cases",
+    "articles": [
+      {
+        "news_id": 38,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 39,
+        "sentiment": "Negative",
+        "bias": "Left"
+      },
+      {
+        "news_id": 40,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      }
+    ],
+    "summary": "The Supreme Court has been dealing with various cases recently. In one case, the court reserved its decision on a plea by Allahabad High Court judge Justice Yashwant Varma challenging an in-house inquiry ordered by the Chief Justice of India over allegations of cash discovery from his official residence. The court emphasized that the Chief Justice's office is not just a post office and has a duty to the nation. In another case, the Supreme Court directed the Speaker of the Telangana Legislative Assembly to decide on petitions seeking the disqualification of 10 MLAs who jumped ship from the Bharat Rashtra Samithi (BRS) to the Congress in three months under the Tenth Schedule of the Constitution."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Supreme Court Decisions and Speaker's Role",
+    "articles": [
+      {
+        "news_id": 31,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 32,
+        "sentiment": "Positive",
+        "bias": "Left"
+      }
+    ],
+    "summary": "The Supreme Court has ruled that constitutional courts can fix a timeline for speakers to decide disqualification petitions. The court also recommended that Parliament revisit provisions allowing Speakers to decide on disqualification under the Anti-Defection Law."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Supreme Court Rulings and Traffic Accidents",
+    "articles": [
+      {
+        "news_id": 34,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 35,
+        "sentiment": "Negative",
+        "bias": "Right"
+      }
+    ],
+    "summary": "The Supreme Court has ruled that a driver's abrupt halt in the middle of a highway, even if triggered by a personal emergency, cannot be justified if it endangers other road users. The court also held that using brakes all of a sudden in the middle of a road or not maintaining sufficient distance from a running vehicle makes a person liable for an accident if it occurs."
+  },
+  {
+    "cluster_date": "2025-07-31",
+    "theme": "Weather and Delhi",
+    "articles": [
+      {
+        "news_id": 36,
+        "sentiment": "Neutral",
+        "bias": "Center"
+      },
+      {
+        "news_id": 37,
+        "sentiment": "Positive",
+        "bias": "Center"
+      }
+    ],
+    "summary": "Delhi witnessed a cloudy sky on Thursday morning after receiving intermittent rains through the night. The weather department has forecast more showers later in the day."
   }
 ]

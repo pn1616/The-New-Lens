@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
-import SentimentBiasChart from '@/components/DashboardCharts';
+import SentimentBiasChart from '@/components/SentimentChart';
 import NewsSidebar from '@/components/NewsSidebar';
 import MainContent from '@/components/MainContent';
 import BiasPieChart from '@/components/BiasPieChart';

@@ -90,6 +90,7 @@ def get_all_articles():
     cur = conn.cursor()
     cur.execute("""
         SELECT sentiment, bias FROM news
+        WHERE sentiment IS NOT NULL AND bias IS NOT NULL
     """)
     
     rows = cur.fetchall()
@@ -132,24 +133,37 @@ def get_source_count():
     conn = get_connection()
     cur = conn.cursor()
     
-    cur.execute("""
-                SELECT 
-                s.source_name as source_name,
-                n.bias,
-                COUNT(*) as count
-            FROM news n
-            JOIN source s ON n.source_id = s.source_id
-            GROUP BY s.source_name, n.bias
-            ORDER BY s.source_name""")
-    rows = cur.fetchall()
+    try:
+        cur.execute("""
+                    SELECT 
+                    s.source_name as source_name,
+                    n.bias,
+                    COUNT(*) as count
+                FROM news n
+                JOIN source s ON n.source_id = s.source_id
+                WHERE n.bias IS NOT NULL
+                GROUP BY s.source_name, n.bias
+                ORDER BY s.source_name""")
+        rows = cur.fetchall()
 
-    data = {}
-    for source_name, bias, count in rows:
-        if source_name not in data:
-            data[source_name] = {"source": source_name, "left": 0, "center": 0, "right": 0}
-        data[source_name][bias.lower()] = count
+        data = {}
+        for source_name, bias, count in rows:
+            if source_name not in data:
+                data[source_name] = {"source": source_name, "left": 0, "center": 0, "right": 0, "neutral": 0}
+            
+            # Handle the bias value safely
+            bias_key = bias.lower() if bias else "neutral"
+            if bias_key in data[source_name]:
+                data[source_name][bias_key] = count
 
-    return jsonify(list(data.values()))
+        return jsonify(list(data.values()))
+    
+    except Exception as e:
+        print("Error fetching source count:", e)
+        return jsonify({"error": "Internal server error"}), 500
+    finally:
+        cur.close()
+        conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)

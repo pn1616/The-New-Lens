@@ -24,8 +24,8 @@ const App = () => (
           <Route path="/cluster/:clusterId" element={<ClusterDetails />} />
           <Route path="/article/:articleId" element={<Article />} />
 
-          <Route path="/index" element={<Index />} /> */
-          <Route path="*" element={<NotFound />} /> */
+          {/* <Route path="/index" element={<Index />} /> */ }
+          {/* <Route path="*" element={<NotFound />} /> */ }
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
