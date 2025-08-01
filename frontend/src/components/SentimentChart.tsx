@@ -2,38 +2,40 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#a28bd4"]; // Add more if needed
+const COLORS = ["#00C49F", "#FFBB28", "#FF8042"]; // positive, neutral, negative
 
-const BiasPieChart = () => {
+const SentimentPieChart = () => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["bias-data"],
+    queryKey: ["sentiment-data"],
     queryFn: async () => {
       const res = await axios.get("http://localhost:5000/api/articles");
+      // console.log("Fetched sentiment data:", res.data);
       return res.data;
+      
     },
   });
 
   const chartData =
     data?.reduce(
-      (acc: Record<string, number>, item: { bias: string }) => {
-        const bias = item.bias.toLowerCase(); // normalize
-        acc[bias] = (acc[bias] || 0) + 1;
+      (acc: Record<string, number>, item: { sentiment: string }) => {
+        const sentiment = item.sentiment.toLowerCase(); // normalize
+        acc[sentiment] = (acc[sentiment] || 0) + 1;
         return acc;
       },
       {} as Record<string, number>
     ) || {};
 
   const pieData = Object.entries(chartData).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize first letter
+    name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize
     value,
   }));
 
   if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading bias data.</p>;
+  if (error) return <p>Error loading data.</p>;
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold text-center mb-4">Bias Analysis</h2>
+      <h2 className="text-xl font-semibold text-center mb-4">Sentiment Analysis</h2>
       <div className="w-full h-[300px]">
         <ResponsiveContainer>
           <PieChart>
@@ -59,4 +61,4 @@ const BiasPieChart = () => {
   );
 };
 
-export default BiasPieChart;
+export default SentimentPieChart;

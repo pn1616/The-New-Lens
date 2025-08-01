@@ -17,8 +17,12 @@ const MainContent = ({ clusterId }: MainContentProps) => {
     error: clusterError,
   } = useQuery({
     queryKey: ['clusterDetails', clusterId],
-    queryFn: () =>
-      axios.get(`http://localhost:5000/api/cluster/${clusterId}`).then((res) => res.data),
+    queryFn: async () =>{
+        const res = await axios.get(`http://localhost:5000/api/cluster/${clusterId}`);
+        console.log(res.data);
+        return res.data;
+    },
+      // axios.get(`http://localhost:5000/api/cluster/${clusterId}`).then((res) => res.data),
     enabled: !!clusterId,
   });
 

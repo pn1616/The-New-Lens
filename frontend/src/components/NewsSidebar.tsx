@@ -82,7 +82,7 @@ const NewsSidebar = ({ onSelectCluster }: NewsSidebarProps) => {
 
   const handleDateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDate(event.target.value);
-    setSelectedClusterId(null); // clear selection when date filter changes
+    setSelectedClusterId(null); 
   };
 
   const handleClusterClick = (id: number) => {
@@ -100,11 +100,10 @@ const NewsSidebar = ({ onSelectCluster }: NewsSidebarProps) => {
 
   return (
     <aside className="w-80 h-screen bg-gray-50 border-r border-gray-200 shadow-sm flex flex-col">
-      {/* Fixed Header */}
+     
       <div className="flex-shrink-0 p-6 border-b border-gray-200 bg-gray-50">
         <h2 className="text-xl font-bold text-gray-900 mb-4 tracking-tight">News Clusters</h2>
         
-        {/* Date Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-900 mb-2">
             <Calendar className="inline w-4 h-4 mr-1" />
@@ -125,7 +124,6 @@ const NewsSidebar = ({ onSelectCluster }: NewsSidebarProps) => {
         </div>
       </div>
 
-      {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-6">
         <ul className="space-y-4">
           {clusters && Array.isArray(clusters) && clusters.length > 0 ? (
