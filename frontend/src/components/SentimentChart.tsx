@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#00C49F", "#FFBB28", "#FF8042"]; // positive, neutral, negative
+const COLORS = ["#00C49F", "#FFBB28", "#FF8042"]; 
 
 const SentimentPieChart = () => {
   const { data, isLoading, error } = useQuery({
@@ -18,7 +18,7 @@ const SentimentPieChart = () => {
   const chartData =
     data?.reduce(
       (acc: Record<string, number>, item: { sentiment: string }) => {
-        const sentiment = item.sentiment.toLowerCase(); // normalize
+        const sentiment = item.sentiment.toLowerCase(); 
         acc[sentiment] = (acc[sentiment] || 0) + 1;
         return acc;
       },
@@ -26,7 +26,7 @@ const SentimentPieChart = () => {
     ) || {};
 
   const pieData = Object.entries(chartData).map(([name, value]) => ({
-    name: name.charAt(0).toUpperCase() + name.slice(1), // Capitalize
+    name: name.charAt(0).toUpperCase() + name.slice(1), 
     value,
   }));
 
