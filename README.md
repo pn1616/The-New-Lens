@@ -198,12 +198,4 @@ Contributions are welcome. To get started:
 
 ---
 
-## License
-
-This project does not currently specify a license. Please contact the repository owner for usage permissions.
-
----
-
-## Author
-
-**pn1616** - [GitHub Profile](https://github.com/pn1616)
+Thank you!
